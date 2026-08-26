@@ -1,22 +1,22 @@
-// Device photo.
+// Photo d'appareil.
 //
-// The user drops an image, the background removal runs on its own, and they see
-// the result immediately. If they aren't happy, a slider adjusts the tolerance
-// and they re-run it; if they'd rather keep the image as is, they can. Nothing
-// leaves the browser.
+// L'utilisateur dépose une image, le détourage se lance seul et il voit le
+// résultat immédiatement. S'il n'est pas satisfait, un curseur ajuste la
+// tolérance et il relance ; s'il préfère garder l'image telle quelle, il le
+// peut. Rien ne quitte le navigateur.
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { detourer, vignette, type ResultatDetourage } from "../../lib/detourage";
 import { Icon } from "../../lib/icons";
 import { translate as tr } from "../../lib/i18n";
 
-const TAILLE_MAX = 8 * 1024 * 1024;   // 8 MB: beyond that, it's a raw photo
+const TAILLE_MAX = 8 * 1024 * 1024;   // 8 Mo : au-delà, c'est une photo brute
 
 export function DevicePhoto({
   t, valeur, onChange,
 }: {
   t: any;
-  /** Current photo as a data URI, or null. */
+  /** Photo actuelle en data-URI, ou null. */
   valeur: string | null;
   onChange: (dataUrl: string | null) => void;
 }) {
@@ -33,9 +33,8 @@ export function DevicePhoto({
     setOccupe(true); setErr("");
     try {
       const r = await detourer(source, { tolerance: tol });
-      // A background removal that takes away almost nothing signals a
-      // too-complex background: better to say so than to deliver an unchanged
-      // image without explanation.
+      // Un détourage qui n'enlève presque rien signale un fond trop complexe :
+      // mieux vaut le dire que de livrer une image inchangée sans explication.
       if (!r.dejaDetouree && r.retire < 0.05) {
         setErr(tr("photo.fondComplexe"));
       }
@@ -63,8 +62,8 @@ export function DevicePhoto({
     traiter(url, tolerance);
   }, [traiter, tolerance]);
 
-  // Pasting an image from the clipboard: it's the most natural gesture right
-  // after copying a photo from a manufacturer datasheet.
+  // Coller une image depuis le presse-papiers : c'est le geste le plus
+  // naturel quand on vient de copier une photo sur une fiche constructeur.
   useEffect(() => {
     const coller = (e: ClipboardEvent) => {
       const it = [...(e.clipboardData?.items || [])].find(i => i.type.startsWith("image/"));
@@ -115,8 +114,8 @@ export function DevicePhoto({
           if (f) prendre(f);
         }}>
 
-        {/* Subtle checkerboard: without it, you can't tell a transparent
-            area from a white one. */}
+        {/* Damier discret : sans lui, on ne distingue pas une zone
+            transparente d'une zone blanche. */}
         {apercu && (
           <div aria-hidden style={{
             position: "absolute", inset: 0, opacity: 0.5,

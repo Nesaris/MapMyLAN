@@ -1,13 +1,13 @@
-// Alert routing.
+// Aiguillage des alertes.
 //
-// An alert goes out to the enabled channels, in the format each one demands.
-// The readable format is the default: it's what someone opening their mail or
-// glancing at their phone expects. The structured format only serves when a
-// ticketing system is plugged in at the other end — without it, sending JSON to
-// a human would be a regression.
+// Une alerte part vers les canaux activés, dans le format que chacun réclame.
+// Le format lisible est celui par défaut : c'est ce qu'attend quelqu'un qui
+// ouvre son courrier ou regarde son téléphone. Le format structuré ne sert que
+// si une billetterie est branchée à l'autre bout — sans elle, envoyer du JSON
+// à un humain serait une régression.
 //
-// Nothing is mandatory. No channel enabled, no ticketing system configured: the
-// alert is simply logged, and the application works.
+// Rien n'est obligatoire. Aucun canal activé, aucune billetterie configurée :
+// l'alerte est simplement journalisée, et l'application fonctionne.
 
 import {
   construireTicket, preparerCourriel, rendreLisible, envoyerApi,
@@ -18,7 +18,7 @@ export type Format = "lisible" | "structure";
 
 export interface ConfigCanal {
   actif: boolean;
-  /** Format expected by the recipient. Readable by default. */
+  /** Format attendu par le destinataire. Lisible par défaut. */
   format?: Format;
 }
 
@@ -26,22 +26,22 @@ export interface ConfigAlertes {
   courriel: ConfigCanal & { adresse?: string };
   bot: ConfigCanal & { jeton?: string; destinataire?: string };
   /**
-   * Ticketing system. Optional: without it, alerts still go out through the
-   * other channels, in their usual format.
+   * Billetterie. Facultative : sans elle, les alertes partent quand même par
+   * les autres canaux, dans leur format habituel.
    */
   billetterie?: {
     actif: boolean;
     url?: string;
     cle?: string;
-    /** Name of the header carrying the key, per the ticketing system used. */
+    /** Nom de l'en-tête portant la clé, selon la billetterie employée. */
     entete?: string;
     /**
-     * Name of the marker field at the head of the document. Ticketing systems
-     * use it to recognize their own format; it differs from one to another.
+     * Nom du champ marqueur en tête du document. Les billetteries s'en servent
+     * pour reconnaître leur propre format ; il diffère de l'une à l'autre.
      */
     marqueur?: string;
   };
-  /** Urgency threshold below which we don't alert. p4 = everything passes. */
+  /** Seuil d'urgence en dessous duquel on n'alerte pas. p4 = tout passe. */
   seuil?: "p1" | "p2" | "p3" | "p4";
   reglages?: Reglages;
 }
@@ -56,14 +56,14 @@ export interface Envoi {
 }
 
 export interface Sortie {
-  /** The built ticket, whatever format was ultimately sent. */
+  /** Le ticket construit, quel que soit le format finalement expédié. */
   ticket: Ticket;
-  /** True if the urgency doesn't reach the threshold: nothing was sent. */
+  /** Vrai si l'urgence n'atteint pas le seuil : rien n'a été envoyé. */
   ignoree: boolean;
   envois: Envoi[];
 }
 
-/** Sending functions provided by the caller: this module does not implement them. */
+/** Fonctions d'envoi fournies par l'appelant : ce module ne les implémente pas. */
 export interface Transports {
   courriel?: (o: { a: string; objet: string; corps: string; entetes: Record<string, string> }) => Promise<void>;
   bot?: (o: { destinataire: string; texte: string }) => Promise<void>;
@@ -71,11 +71,11 @@ export interface Transports {
 }
 
 /**
- * Emits an alert.
+ * Émet une alerte.
  *
- * The ticket is built once, then rendered in each channel's format. Building
- * two separate objects for the same alert would open the door to divergences —
- * one title here, another there.
+ * Le ticket est construit une seule fois puis rendu dans le format de chaque
+ * canal. Construire deux objets distincts pour la même alerte ouvrirait la
+ * porte à des divergences — un titre ici, un autre là.
  */
 export async function alerter(
   ev: Evenement,
@@ -86,17 +86,17 @@ export async function alerter(
   const t = construireTicket(ev, ctx, cfg.reglages || {});
   const envois: Envoi[] = [];
 
-  // The threshold is compared on rank, not on the string: "p4" is not greater
-  // than "p1" alphabetically.
+  // Le seuil se compare sur le rang, pas sur la chaîne : « p4 » n'est pas
+  // supérieur à « p1 » alphabétiquement.
   const seuil = cfg.seuil || "p4";
   if (RANG[t.urgence] > RANG[seuil]) {
-    tr.journal?.("info", `Alert ${t.urgence} below threshold ${seuil}: ${t.titre}`);
+    tr.journal?.("info", `Alerte ${t.urgence} sous le seuil ${seuil} : ${t.titre}`);
     return { ticket: t, ignoree: true, envois };
   }
 
-  // ── Ticketing system ───────────────────────────────────────────────────────
-  // Queried first: its response carries a ticket reference, which we can then
-  // cite in the messages meant for humans.
+  // ── Billetterie ──────────────────────────────────────────────────────────
+  // Interrogée en premier : sa réponse porte une référence de ticket, qu'on
+  // peut alors citer dans les messages destinés aux humains.
   let reference = "";
   const b = cfg.billetterie;
   if (b?.actif && b.url) {
@@ -105,14 +105,14 @@ export async function alerter(
     envois.push({
       canal: "billetterie", ok: r.ok, format: "structure",
       detail: r.ok
-        ? (r.regroupe ? `${r.ref} — additional occurrence` : r.ref)
+        ? (r.regroupe ? `${r.ref} — occurrence supplémentaire` : r.ref)
         : r.erreur,
     });
     if (r.ok && r.ref) reference = r.ref;
-    if (!r.ok) tr.journal?.("warn", `Ticketing system: ${r.erreur}`);
+    if (!r.ok) tr.journal?.("warn", `Billetterie : ${r.erreur}`);
   }
 
-  // ── Email ────────────────────────────────────────────────────────────────
+  // ── Courriel ─────────────────────────────────────────────────────────────
   if (cfg.courriel?.actif && cfg.courriel.adresse && tr.courriel) {
     const structure = cfg.courriel.format === "structure";
     try {
@@ -129,13 +129,13 @@ export async function alerter(
       }
       envois.push({ canal: "courriel", ok: true, format: structure ? "structure" : "lisible" });
     } catch (e: any) {
-      envois.push({ canal: "courriel", ok: false, detail: e?.message || "send failure" });
-      tr.journal?.("warn", `Email: ${e?.message || "failure"}`);
+      envois.push({ canal: "courriel", ok: false, detail: e?.message || "échec d'envoi" });
+      tr.journal?.("warn", `Courriel : ${e?.message || "échec"}`);
     }
   }
 
   // ── Bot ──────────────────────────────────────────────────────────────────
-  // Always readable: nobody reads JSON on their phone.
+  // Toujours lisible : personne ne lit du JSON sur son téléphone.
   if (cfg.bot?.actif && cfg.bot.destinataire && tr.bot) {
     try {
       await tr.bot({
@@ -144,23 +144,23 @@ export async function alerter(
       });
       envois.push({ canal: "bot", ok: true, format: "lisible" });
     } catch (e: any) {
-      envois.push({ canal: "bot", ok: false, detail: e?.message || "send failure" });
-      tr.journal?.("warn", `Bot: ${e?.message || "failure"}`);
+      envois.push({ canal: "bot", ok: false, detail: e?.message || "échec d'envoi" });
+      tr.journal?.("warn", `Bot : ${e?.message || "échec"}`);
     }
   }
 
   if (!envois.length) {
-    tr.journal?.("info", `No active channel — alert logged only: ${t.titre}`);
+    tr.journal?.("info", `Aucun canal actif — alerte journalisée seulement : ${t.titre}`);
   }
   return { ticket: t, ignoree: false, envois };
 }
 
 /**
- * Sets the marker field expected by the ticketing system.
+ * Pose le champ marqueur attendu par la billetterie.
  *
- * The schema provides for one at the head of the document so the recipient
- * recognizes its format. Its name varies from one ticketing system to another,
- * hence this setting rather than a value hardcoded in the code.
+ * Le schéma en prévoit un en tête de document pour que le destinataire
+ * reconnaisse son format. Son nom varie d'une billetterie à l'autre, d'où ce
+ * réglage plutôt qu'une valeur figée dans le code.
  */
 function marquer(t: Ticket, nom?: string): Ticket {
   const cle = (nom || "ticket").replace(/[^a-z0-9_]/gi, "").slice(0, 32) || "ticket";
@@ -168,7 +168,7 @@ function marquer(t: Ticket, nom?: string): Ticket {
   return { [cle]: 1, ...reste } as Ticket;
 }
 
-/** Default settings: nothing enabled, readable format everywhere. */
+/** Réglages par défaut : rien d'activé, format lisible partout. */
 export function configParDefaut(): ConfigAlertes {
   return {
     courriel: { actif: false, format: "lisible" },
