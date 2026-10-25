@@ -19,9 +19,9 @@ const FORM_SSH = () => ({ name: '', host: '', port: 22, username: '', password: 
 export function pageSsh(p) {
   let liste = [], choisi = null, lignes = [], ouvert = false, essai = null;
   let form = FORM_SSH();
-  const zoneForm = h('div');
+  const zoneForm = h('div', { class: 'zone-form' });
   const zoneEmpreinte = h('div', { class: 'ssh-empreinte' });
-  const equipements = h('div');
+  const equipements = h('div', { class: 'colonne' });
   const corps = h('div', { class: 'termbody' });
   const titreTerm = h('span', { class: 'mono term-titre' });
   const relie = h('span', { class: 'pousse' });
@@ -347,8 +347,8 @@ export function pageInventaire() {
               h('td', { class: 'droite' }, h('button', { class: 'lnk', type: 'button', 'aria-label': `Supprimer ${r.nom}`, onclick: () => supprimer(r) }, '✕')));
           }))),
         listees.length === 0 ? vide('Aucune référence', 'switch') : null),
-        h('div', {},
-          carte({ titre: 'Zones', note: 'regroupement', classe: 'avec-marge' },
+        h('div', { class: 'colonne' },
+          carte({ titre: 'Zones', note: 'regroupement' },
             zones.map(z => h('div', { class: 'zrow' }, h('span', { class: 'ivig' }, ic('map', 14)),
               h('span', { class: 'zrow-c' }, h('b', { text: z }), h('small', { text: `${refs.filter(r => r.zone === z).length} référence(s)` })))),
             zones.length === 0 ? pad(h('div', { class: 'explication haut', text: 'Nomme une zone sur une référence et elle apparaîtra ici.' })) : null),
