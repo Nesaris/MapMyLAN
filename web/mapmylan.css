@@ -139,7 +139,7 @@ html[data-gamme="console"] .swap-haut:hover{background:var(--k-raise);opacity:1}
   [data-shell="workshop"] .stage{padding:14px 16px 16px}
   [data-shell="workshop"] .title{font-size:24px}
   [data-shell="workshop"] .headrow{margin-bottom:14px}
-  [data-shell="workshop"] .figs{gap:12px;margin-bottom:14px}
+  [data-shell="workshop"] .figs{gap:var(--ecart);margin-bottom:var(--ecart)}
   [data-shell="workshop"] .grid3{height:calc(100vh - 400px);min-height:360px}
   [data-shell="workshop"] .termbody{max-height:calc(100vh - 420px)}
   [data-shell="workshop"] section.page .card,[data-shell="workshop"] section.page .set,[data-shell="workshop"] section.page .term{border-radius:0;box-shadow:none;border:1px solid var(--hair);margin-bottom:-1px}
@@ -180,7 +180,7 @@ html[data-gamme="console"] .swap-haut:hover{background:var(--k-raise);opacity:1}
 :where(section.page,.fcarte,.page-routeur) .btn{display:flex;min-height:0}
 :where(section.page,.fcarte,.page-routeur) .btn[disabled]{opacity:.55;cursor:default}
 :where(section.page,.fcarte,.gf,.modale) .lbl{margin-bottom:5px}
-:where(section.page,.fcarte) .note.info,:where(section.page,.fcarte) .note.warn{margin-bottom:16px}
+:where(section.page,.fcarte) .note.info,:where(section.page,.fcarte) .note.warn{margin-bottom:var(--ecart)}
 :where(section.page,.fcarte) .lnk{padding:2px 6px;border-radius:0}
 /* Dans l'en-tête d'une carte, « note » est une mention discrète, pas l'encart
    de SOMA du même nom : ni marge intérieure ni fond. */
@@ -195,7 +195,7 @@ textarea.field.mml{min-height:0;line-height:normal}
 /* L'espacement vertical des pages suit la 1.4 : quelques paires précises,
    pas un intervalle uniforme entre tout ce qui se suit. */
 section.page>*+*{margin-top:0}
-section.page>.card+.card,section.page>.card+.set,section.page>.split+.card,section.page>.card+.split,section.page>.figs+.card{margin-top:16px}
+section.page>.card+.card,section.page>.card+.set,section.page>.split+.card,section.page>.card+.split,section.page>.figs+.card{margin-top:var(--ecart)}
 .aide+.aide{margin-top:8px}
 .rien{padding:34px 20px;text-align:center;color:var(--faint);font-family:var(--mono);font-size:12px}
 .rien svg{margin:0 auto 10px;opacity:.7}
@@ -234,7 +234,8 @@ section.page>.card+.card,section.page>.card+.set,section.page>.split+.card,secti
 .cve-desc{font-size:12px;margin-top:2px;max-width:52ch}
 .split.s300{grid-template-columns:300px minmax(0,1fr)}
 .split.s300d{grid-template-columns:minmax(0,1fr) 300px}
-.avec-marge{margin-bottom:16px}
+/* Le formulaire d'ajout s'ouvre au-dessus de la liste, à un écart d'elle. */
+.zone-form:not(:empty){margin-bottom:var(--ecart)}
 .filtres{margin-left:auto;display:flex;gap:3px;flex-wrap:wrap;max-width:62%;justify-content:flex-end}
 .ftr{font-size:11.5px;color:var(--muted);padding:4px 10px;border-radius:7px;white-space:nowrap}
 .ftr:hover{background:var(--well);color:var(--ink-soft)}
@@ -286,7 +287,7 @@ section.page>.card+.card,section.page>.card+.set,section.page>.split+.card,secti
 .ssh-empreinte .empreinte{margin-top:12px}
 
 /* Réglages : un bloc par sujet, même gouttière et même en-tête que les cartes. */
-.set{background:var(--surface);border-radius:14px;box-shadow:var(--lift);overflow:hidden;margin-bottom:16px}
+.set{background:var(--surface);border-radius:14px;box-shadow:var(--lift);overflow:hidden;margin-bottom:var(--ecart)}
 .set>header{display:flex;align-items:center;gap:10px;padding:15px 18px 13px}
 .set>header .tile{margin-bottom:0}
 .set>header h2{font-size:13.5px;font-weight:600}
@@ -457,7 +458,7 @@ textarea.modale-champ{resize:vertical}
 .modale-ok:disabled{cursor:not-allowed;opacity:.5}
 
 /* Trafic mondial : journal, globe, classements. */
-.grid3{display:flex;gap:16px;height:calc(100vh - 210px);min-height:520px}
+.grid3{display:flex;gap:var(--ecart);height:calc(100vh - 210px);min-height:520px}
 .panel{background:var(--surface);border-radius:14px;box-shadow:var(--lift);display:flex;flex-direction:column;overflow:hidden;min-width:0}
 .pw-l{width:320px;flex:none}
 .pw-r{width:280px;flex:none;overflow-y:auto}
@@ -737,7 +738,8 @@ table.boites td{padding:12px 16px;font-size:13px}
 /* Équipement réseau principal. */
 .page-routeur{padding:22px 32px 60px;max-width:1180px}
 .routeur-tete{display:flex;align-items:flex-end;gap:12px 20px;margin-bottom:26px;flex-wrap:wrap}
-.routeur-tete>.grow{flex:1 1 280px}
+/* Le titre garde sa ligne : les actions passent dessous avant qu'il ne se replie. */
+.routeur-tete>.grow{flex:1 1 auto;min-width:0}
 .routeur-tete h1{font-size:38px;line-height:1.05;letter-spacing:-.035em;margin:0 0 7px;font-weight:600;overflow-wrap:anywhere}
 .routeur-tete p{color:var(--muted);font-size:14.5px;max-width:54ch;margin:0}
 .routeur-actions{margin-left:auto;display:flex;gap:9px;flex-wrap:wrap}
@@ -749,7 +751,7 @@ table.boites td{padding:12px 16px;font-size:13px}
 .routeur-vide-t{font-size:16px;font-weight:600;letter-spacing:-.02em;margin-bottom:6px}
 .routeur-vide p{color:var(--muted);font-size:13.5px;max-width:46ch;margin:0 auto 20px}
 .routeur-vide .centre{display:flex;justify-content:center}
-.routeur-carte{background:var(--surface);border-radius:14px;box-shadow:var(--lift);padding:20px;margin-bottom:16px;min-width:0}
+.routeur-carte{background:var(--surface);border-radius:14px;box-shadow:var(--lift);padding:20px;margin-bottom:var(--ecart);min-width:0}
 .routeur-id{display:flex;align-items:center;gap:14px;min-width:0}
 .routeur-ic{width:40px;height:40px;border-radius:12px;background:var(--wash);color:var(--accent);display:flex;align-items:center;justify-content:center;flex:none}
 .routeur-nom{font-size:15px;font-weight:600;letter-spacing:-.02em}
@@ -1240,11 +1242,11 @@ html[data-gamme="console"] .plages-rail{display:block;margin-bottom:12px}
 html[data-gamme="console"] .sec-rail{display:flex;justify-content:space-between;align-items:center;color:var(--faint);font-size:12px;padding:20px 10px 6px}
 html[data-gamme="console"] .sec-rail .plus{color:var(--faint);font-size:15px;line-height:1;width:22px;height:22px;border-radius:6px;display:grid;place-items:center}
 html[data-gamme="console"] .sec-rail .plus:hover{background:var(--well);color:var(--ink)}
-html[data-gamme="console"] .plage{display:flex;align-items:center;gap:10px;width:100%;padding:8px 10px;border-radius:8px;color:var(--ink-soft);text-align:left;min-width:0}
-html[data-gamme="console"] .plage:hover{background:var(--well);color:var(--ink)}
-html[data-gamme="console"] .plage svg{flex:none}
-html[data-gamme="console"] .plage .lib{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-html[data-gamme="console"] .plage .cidr{margin-left:auto;font-family:var(--mono);font-size:11px;color:var(--faint);white-space:nowrap;flex:none}
+html[data-gamme="console"] .plages-rail .plage{display:flex;align-items:center;gap:10px;width:100%;padding:8px 10px;border-radius:8px;color:var(--ink-soft);text-align:left;min-width:0}
+html[data-gamme="console"] .plages-rail .plage:hover{background:var(--well);color:var(--ink)}
+html[data-gamme="console"] .plages-rail .plage svg{flex:none}
+html[data-gamme="console"] .plages-rail .plage .lib{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+html[data-gamme="console"] .plages-rail .plage .cidr{margin-left:auto;font-family:var(--mono);font-size:11px;color:var(--faint);white-space:nowrap;flex:none}
 @media (min-width:1101px){
   html[data-gamme="console"] .top .recherche{display:none}
 }

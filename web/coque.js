@@ -155,7 +155,7 @@ function rail(p, b, navs) {
   p.suivre('scanRunning', peindreCarte);
   peindreCarte();
 
-  return h('aside', { class: 'rail', 'aria-label': 'Navigation' },
+  return h('nav', { class: 'rail', 'aria-label': 'Navigation' },
     h('div', { class: 'mark' },
       // La marque porte sa propre transparence : ni fond ni arrondi, elle tient
       // sur le clair comme sur le sombre. La gamme Console la pose dans une
