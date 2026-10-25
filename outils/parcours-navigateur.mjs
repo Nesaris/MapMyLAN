@@ -12,6 +12,10 @@
 //
 //   node outils/parcours-navigateur.mjs [dossier des captures] [--gestes]
 //
+// SOCLE_THEME choisit la gamme (soma par défaut). PARCOURS_PORT fixe les
+// ports au lieu d'en prendre de libres : l'instance sur celui-là, les faux
+// services de messagerie et de VIGIE sur les deux suivants.
+//
 // --gestes : une seule largeur par écran, pour mettre au point un geste vite.
 //
 // Playwright et Chromium viennent de l'environnement d'essai, hors du dépôt.
@@ -29,6 +33,8 @@ const seulementGestes = parametres.includes('--gestes');
 fs.mkdirSync(sortie, { recursive: true });
 const MOT_DE_PASSE = 'phrase de passe pour mapmylan en local';
 const CAPTURES = [360, 768, 1280, 1920];
+const PORT = Number(process.env.PARCOURS_PORT) || 0;
+const portSuivant = n => (PORT ? PORT + n : 0);
 
 // Le parc simulé : ce que les outils de découverte rendraient sur un réseau
 // de documentation. Les types se déduisent des noms et des ports, comme
@@ -91,8 +97,8 @@ const telegram = await serveurLocal((req, res) => {
   res.setHeader('content-type', 'application/json');
   if (req.url.includes('/getUpdates')) setTimeout(() => res.end('{"ok":true,"result":[]}'), 300);
   else res.end('{"ok":true,"result":{}}');
-});
-// SOCLE_THEME=console refait tout le parcours dans la gamme Console.
+}, portSuivant(1));
+// SOCLE_THEME=console (exploitation, lavande) refait tout le parcours dans cette gamme.
 // Une fausse VIGIE : la page Vigie et la section de la fiche la lisent.
 const JETON_VIGIE = `cer_mapmylan_${'0'.repeat(64)}`;
 const maintenant = Date.now();
@@ -119,9 +125,9 @@ const vigie = await serveurLocal((req, res) => {
   ]));
   if (req.url.startsWith('/api/constats')) return res.end(JSON.stringify({ audit: { id: auditVigie.id, debut: auditVigie.debut }, constats: constatsVigie.slice(2, 4) }));
   res.end('{}');
-});
+}, portSuivant(2));
 const GAMME = process.env.SOCLE_THEME || 'soma';
-const o = await lancer({ SCAN_SUBNET: '192.0.2.0/24', SOCLE_THEME: GAMME, VIGIE_URL: vigie.url, VIGIE_JETON: JETON_VIGIE }, { executeur: reseau.executeur, telegramBase: telegram.url });
+const o = await lancer({ PORT: String(PORT), SCAN_SUBNET: '192.0.2.0/24', SOCLE_THEME: GAMME, VIGIE_URL: vigie.url, VIGIE_JETON: JETON_VIGIE }, { executeur: reseau.executeur, telegramBase: telegram.url });
 // localhost et non 127.0.0.1 : une clé d'accès se lie à un nom de domaine.
 const base = `http://localhost:${o.port}`;
 

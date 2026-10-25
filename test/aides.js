@@ -55,7 +55,7 @@ export async function inviter(admin, identifiant, role) {
 }
 
 // Un serveur HTTP local qui note ce qu'il reçoit.
-export async function serveurLocal(gestionnaire) {
+export async function serveurLocal(gestionnaire, portVoulu = 0) {
   const recues = [];
   const serveur = http.createServer(async (req, res) => {
     const morceaux = [];
@@ -64,7 +64,7 @@ export async function serveurLocal(gestionnaire) {
     recues.push({ methode: req.method, url: req.url, entetes: req.headers, corps });
     gestionnaire(req, res, corps);
   });
-  await new Promise(r => serveur.listen(0, '127.0.0.1', r));
+  await new Promise(r => serveur.listen(portVoulu, '127.0.0.1', r));
   const port = serveur.address().port;
   return { port, url: `http://127.0.0.1:${port}`, recues, fermer: () => new Promise(r => { serveur.closeAllConnections(); serveur.close(r); }) };
 }
