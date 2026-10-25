@@ -199,3 +199,6 @@ Balayage B.5 sur les fichiers touchés depuis le 2026-10-02 (`src/api/passerelle
 
 ## Suivi du 2026-10-22 (2.3.0)
 Module `src/reveil.js` (paquet, MAC, diffusions, envoi), une fonction par geste ; la route de la fiche et celle des services partagent `reveiller`. Vocabulaire et quotas (`Debit`, `payer`, `acces.tracer`) repris des routes voisines. 66 essais verts, dont 2 nouveaux.
+
+## Suivi du 2026-10-25 (2.3.1)
+Mise en page seulement, sur le socle 6f2c864 : écarts codés en dur remplacés par `var(--ecart)` du socle, `.avec-marge` retirée au profit de `.colonne` du socle (inventaire, liste des consoles SSH), `.zone-form` pour le formulaire SSH, sélecteurs du rail Console bornés à `.plages-rail`, rail en `nav` comme le socle l'attend. Parcours : ports fixes par `PARCOURS_PORT`, `serveurLocal` des essais accepte un port. Interface seulement : aucune route ne change. 66 essais verts, inchangés ; 77 du socle embarqué.
