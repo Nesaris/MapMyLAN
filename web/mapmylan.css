@@ -54,6 +54,9 @@ b.tronque,span.tronque{display:block}
 .stage{padding-bottom:28px}
 .mark .marque{height:26px;width:auto}
 .wtop .brand .marque{height:22px;width:auto}
+.mark .logo-texte{height:22px}
+.wtop .brand .logo-texte{height:18px}
+.mark>b{display:none}
 .marque{display:block;flex:none;object-fit:contain;image-rendering:auto;border-radius:0;background:none}
 .top .ghost.langue{width:auto;padding:0 11px;font-family:var(--mono);font-size:11px}
 
@@ -1232,7 +1235,7 @@ textarea.ob-field{resize:vertical;font-size:11.5px;line-height:1.5}
 .rail>*{flex-shrink:0}
 html[data-gamme="console"] .mark .marque,html[data-gamme="console"] .mark .pulse{display:none}
 html[data-gamme="console"] .mark .tuile{display:grid;place-items:center;width:26px;height:26px;border-radius:7px;background:var(--k-tile);color:var(--k-on-tile);flex:none}
-html[data-gamme="console"] .mark b{flex:1}
+html[data-gamme="console"] .mark b{flex:1;display:inline}
 html[data-gamme="console"] .mark .chev{display:flex;color:var(--faint);flex:none}
 html[data-gamme="console"] .rail-cherche{display:flex;align-items:center;gap:8px;width:100%;padding:9px 12px;background:var(--well);border:1px solid var(--hair);border-radius:9px;color:var(--faint);margin-bottom:8px;font-size:14px;min-width:0}
 html[data-gamme="console"] .rail-cherche span{flex:1;text-align:left;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
