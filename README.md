@@ -1,3 +1,12 @@
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="medias/logo-sombre.svg">
+    <img src="medias/logo-clair.svg" alt="MapMyLAN" height="56">
+  </picture>
+</p>
+
+<p align="center"><img src="medias/affiche.png" alt="Affiche de MapMyLAN" width="100%"></p>
+
 # MapMyLAN
 
 **Cartographie, surveille et défend le réseau local.** Découverte des
@@ -10,6 +19,26 @@ La version 2 est une réécriture du serveur : Node 24 seul, aucune dépendance
 npm, base SQLite (`node:sqlite`), interface statique sans construction, et le
 socle commun des services pour les comptes et la sécurité. Le contrat entre
 serveur et interface est dans [docs/API.md](docs/API.md).
+
+## Aperçu
+
+| <img src="medias/capture-1.png" alt="La carte du réseau"> |
+|:--:|
+| La carte du réseau |
+
+| <img src="medias/capture-2.png" alt="Le tableau de bord"> |
+|:--:|
+| Le tableau de bord |
+
+| <img src="medias/capture-3.png" alt="Les appareils"> |
+|:--:|
+| Les appareils |
+
+| <img src="medias/capture-4.png" alt="Les vulnérabilités"> |
+|:--:|
+| Les vulnérabilités |
+
+Quatre gammes d’interface au choix — SOMA, Console, Exploitation, Lavande — en clair ou en sombre, de 360 à 1920 px de large.
 
 ## Ce que fait MapMyLAN
 
@@ -111,6 +140,33 @@ lancée dans le conteneur prend `-u node` (voir « Sauvegardes »).
 
 Sans Docker : Node 24.7 ou plus récent, les outils `nmap arp-scan iputils-ping
 openssh-client avahi-utils samba-common-bin snmp iproute2`, puis `npm start`.
+
+## Première configuration et mises à jour
+
+Au premier démarrage, ouvre l’interface : tu crées le compte administrateur avec
+le jeton d’installation (affiché dans les journaux du conteneur, ou transmis par
+le Hub), tu inscris tes facteurs de connexion, puis l’**assistant de
+configuration** passe les réglages de MapMyLAN groupe par groupe. Il est
+obligatoire : MapMyLAN reste fermé tant qu’il n’est pas terminé. Chaque valeur
+proposée convient pour commencer.
+
+<p align="center"><img src="medias/assistant.png" alt="Assistant de configuration" width="70%"></p>
+
+Réglages demandés : réseau à cartographier, balayage automatique toutes les (secondes), interface réseau du balayage, préfixe de regroupement, adresse d’Ollama, modèle, questions par compte et par jour, questions par jour, tous comptes, questions par compte et par minute, adresse de RAVYN, adresse d’expédition, clé d’envoi RAVYN ; plus ceux de
+tous les services (adresse publique, relais de confiance, gamme de
+l’interface, contact de sécurité, courriels d’alerte).
+
+Après une mise à jour qui apporte un réglage nouveau, l’assistant revient au
+passage suivant d’un administrateur et ne demande **que ce réglage-là**. Une
+mise à jour sans réglage nouveau ne demande rien : une fenêtre « Quoi de neuf »
+résume ce qu’elle apporte, une fois par compte, et se ferme d’un clic
+(`nouveautes.json`).
+
+Tout reste modifiable dans **Comptes → Réglages du service**. Une variable
+posée dans l’environnement l’emporte toujours et n’est pas demandée. MapMyLAN
+redémarre seul pour appliquer un changement (le processus du conteneur le
+supervise). Les valeurs vivent dans `reglages.json`, dans le volume de
+données ; les secrets y sont scellés par la clé maîtresse.
 
 ## Mise à jour depuis la 1.4.1
 
