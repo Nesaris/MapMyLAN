@@ -5,7 +5,7 @@
 // n'est pas terminée, puis la coquille et la page demandée. Tout est
 // construit ici, sans étape de compilation : chaque module est servi tel quel.
 import { porte, pageSecurite, pageComptes, appliquerTheme, toast } from '/socle/compte.js';
-import { h, ic, remplir } from './dom.js';
+import { h, ic, remplir, logoMarque } from './dom.js';
 import { E, api, poser, portee, suivre, chargerTout, brancherFlux, choisirPage } from './etat.js';
 import { langue, surLangue } from './i18n.js';
 import { coque, NAV } from './coque.js';
@@ -105,7 +105,7 @@ async function demarrer() {
   document.documentElement.dataset.shell = E.shell;
   document.documentElement.lang = langue();
 
-  const etat = await porte({ api, service: SERVICE, marque: ic('logo', 18), sousTitre: 'Connexion à votre réseau' });
+  const etat = await porte({ api, service: SERVICE, marque: logoMarque(20), sousTitre: 'Connexion à votre réseau' });
   const compte = etat.session.compte;
   poser({ moi: compte, page: pageDeAdresse() || 'dashboard' });
 

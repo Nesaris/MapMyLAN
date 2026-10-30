@@ -12,7 +12,7 @@
 // contenu des pages est rigoureusement le même d'une disposition à l'autre.
 // Sous 760 px, l'atelier n'a plus la place de ses panneaux : la feuille
 // ramène alors la disposition de lecture, rail en tiroir.
-import { h, ic, pictoType, remplir } from './dom.js';
+import { h, ic, pictoType, remplir, logoMarque } from './dom.js';
 import { E, api, choisirPage, choisirAppareil, changerDisposition, lancerBalayage, poser } from './etat.js';
 import { t, langue, changerLangue } from './i18n.js';
 import { boutonAssistant, basculer as basculerAssistant } from './assistant/panneau.js';
@@ -157,10 +157,10 @@ function rail(p, b, navs) {
 
   return h('nav', { class: 'rail', 'aria-label': 'Navigation' },
     h('div', { class: 'mark' },
-      // La marque porte sa propre transparence : ni fond ni arrondi, elle tient
-      // sur le clair comme sur le sombre. La gamme Console la pose dans une
+      // La marque est dessinée dans la couleur du texte : ni fond ni arrondi,
+      // elle tient sur le clair comme sur le sombre. La gamme Console la pose dans une
       // tuile claire, suivie du sélecteur.
-      h('img', { class: 'marque', src: '/logo.png', alt: 'MapMyLAN' }),
+      logoMarque(26),
       h('span', { class: 'tuile', 'aria-hidden': 'true' }, ic('map', 16, { trait: 2.2 })),
       h('b', { text: 'MapMyLAN' }), h('span', { class: 'pulse' }), h('span', { class: 'chev', 'aria-hidden': 'true' }, ic('deplier', 14))),
     h('button', { class: 'rail-cherche', type: 'button', onclick: () => ouvrirPalette() },
@@ -293,7 +293,7 @@ function atelierHaut(p) {
   peindre();
   const petit = { width: 28, height: 28 };
   return h('div', { class: 'wtop' },
-    h('div', { class: 'brand' }, h('img', { class: 'marque', src: '/logo.png', alt: 'MapMyLAN' }),
+    h('div', { class: 'brand' }, logoMarque(22),
       h('div', {}, h('b', { text: 'MapMyLAN' }), ' ', hotes)),
     h('div', { class: 'wcentre' }, recherche({ atelier: true })),
     h('div', { class: 'wboutons' },

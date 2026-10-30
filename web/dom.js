@@ -151,6 +151,19 @@ const PICTOS = {
 // Des constantes de ce fichier, lues comme SVG par le socle : jamais une donnée.
 ajouterPictos(Object.fromEntries(Object.entries(PICTOS).map(([k, v]) => [`m:${k}`, v])));
 
+/** Le logo de MapMyLAN, dans la couleur du texte : la marque de la barre, de
+ *  l'atelier et de l'écran de connexion (même tracé que l'icône de l'onglet). */
+export function logoMarque(taille = 22) {
+  const s = document.createElementNS(SVG, 'svg');
+  s.setAttribute('width', taille); s.setAttribute('height', taille);
+  s.setAttribute('viewBox', '26 20 204 204'); s.setAttribute('role', 'img'); s.setAttribute('aria-label', 'MapMyLAN'); s.setAttribute('class', 'marque');
+  const p = document.createElementNS(SVG, 'path');
+  p.setAttribute('d', 'M38 168C38 160.28 41.98 153.48 48 149.56V106C48 77.28 71.28 54 100 54H156C184.72 54 208 77.28 208 106V149.56C214.02 153.48 218 160.28 218 168C218 180.15 208.15 190 196 190C183.85 190 174 180.15 174 168C174 160.28 177.98 153.48 184 149.56V106C184 90.54 171.46 78 156 78H140V149.56C146.02 153.48 150 160.28 150 168C150 180.15 140.15 190 128 190C115.85 190 106 180.15 106 168C106 160.28 109.98 153.48 116 149.56V78H100C84.54 78 72 90.54 72 106V149.56C78.02 153.48 82 160.28 82 168C82 180.15 72.15 190 60 190C47.85 190 38 180.15 38 168Z');
+  p.setAttribute('fill', 'currentColor');
+  s.append(p);
+  return s;
+}
+
 /** Picto du jeu MapMyLAN. Un nom inconnu dessine le point d'interrogation. */
 export function ic(nom, taille = 16, { trait, style, classe } = {}) {
   const el = icone(`m:${PICTOS[nom] ? nom : 'unknown'}`, taille);
