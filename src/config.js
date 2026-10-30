@@ -53,6 +53,25 @@ export const SPEC = {
   voixJourTotal: { env: 'MAPMYLAN_VOIX_JOUR_TOTAL', type: 'entier', min: 1, max: 1000000, defaut: 2000 },
 };
 
+// Ce que l'assistant de configuration demande (première installation, puis
+// seulement les réglages nouveaux d'une mise à jour). depuis : la version qui
+// a ajouté le réglage.
+export const REGLAGES_MAPMYLAN = [
+  { env: 'SCAN_SUBNET', groupe: 'Réseau', libelle: 'Réseau à cartographier', exemple: '192.168.1.0/24', depuis: '2.4.0', requis: true,
+    aide: 'La plage de ton réseau local, en notation CIDR. D’autres plages s’ajoutent ensuite dans MapMyLAN.' },
+  { env: 'SCAN_INTERVAL', groupe: 'Réseau', libelle: 'Balayage automatique toutes les (secondes)', depuis: '2.4.0', aide: '0 : seulement les balayages que tu lances.' },
+  { env: 'SCAN_INTERFACE', groupe: 'Réseau', libelle: 'Interface réseau du balayage', exemple: 'eth0', depuis: '2.4.0', avance: true, aide: 'Vide : celle de la route par défaut.' },
+  { env: 'GROUPING_PREFIX', groupe: 'Réseau', libelle: 'Préfixe de regroupement', exemple: '192.168', depuis: '2.4.0', avance: true },
+  { env: 'IA_URL', groupe: 'Assistant IA', libelle: 'Adresse d’Ollama', exemple: 'http://ollama:11434', depuis: '2.4.0', aide: 'Facultatif : l’assistant qui répond sur ton réseau. Vide : désactivé.' },
+  { env: 'IA_MODELE', groupe: 'Assistant IA', libelle: 'Modèle', exemple: 'qwen3:14b', depuis: '2.4.0' },
+  { env: 'MAPMYLAN_IA_JOUR', groupe: 'Assistant IA', libelle: 'Questions par compte et par jour', depuis: '2.4.0', avance: true },
+  { env: 'MAPMYLAN_IA_JOUR_TOTAL', groupe: 'Assistant IA', libelle: 'Questions par jour, tous comptes', depuis: '2.4.0', avance: true },
+  { env: 'MAPMYLAN_IA_MINUTE', groupe: 'Assistant IA', libelle: 'Questions par compte et par minute', depuis: '2.4.0', avance: true },
+  { env: 'POSTE_URL', groupe: 'Courriels (RAVYN)', libelle: 'Adresse de RAVYN', exemple: 'https://ravyn.exemple.org', depuis: '2.4.0', aide: 'Facultatif : alertes envoyées par courriel via RAVYN.' },
+  { env: 'POSTE_FROM', groupe: 'Courriels (RAVYN)', libelle: 'Adresse d’expédition', exemple: 'alertes@exemple.org', depuis: '2.4.0' },
+  { env: 'POSTE_SEND_KEY', groupe: 'Courriels (RAVYN)', libelle: 'Clé d’envoi RAVYN', depuis: '2.4.0' },
+];
+
 export function lireConfigMapmylan(env = process.env) {
   const cfg = lireConfig(SPEC, env);
   const erreurs = [];
