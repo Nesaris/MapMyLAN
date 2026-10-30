@@ -22,7 +22,7 @@ RUN printf 'deb [check-valid-until=no] http://snapshot.debian.org/archive/debian
  && find / -xdev -perm /6000 -type f -exec chmod a-s {} +
 
 WORKDIR /app
-COPY package.json ./
+COPY package.json nouveautes.json ./
 COPY socle ./socle
 COPY src ./src
 COPY web ./web

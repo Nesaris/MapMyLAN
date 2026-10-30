@@ -3,8 +3,8 @@
 // serveur HTTP.
 import http from 'node:http';
 import path from 'node:path';
-import { Debit, ErreurHttp, demarrerSocle, entetesSecurite, envelopper, nonceCsp, politiqueContenu, repondreErreur, repondreJson, servirFichier } from '../socle/src/index.js';
-import { lireConfigMapmylan, VERSION } from './config.js';
+import { Debit, ErreurHttp, appliquerReglages, demarrerSocle, lireNouveautes, superviser, entetesSecurite, envelopper, nonceCsp, politiqueContenu, repondreErreur, repondreJson, servirFichier } from '../socle/src/index.js';
+import { lireConfigMapmylan, VERSION, SPEC, REGLAGES_MAPMYLAN } from './config.js';
 import { nouvelId, ouvrirBase } from './db.js';
 import { Evenements } from './evenements.js';
 import { Reglages } from './reglages.js';
@@ -83,10 +83,16 @@ function amorcer({ db, reglages, cfg }) {
  * fluxControleMs (contrôle des sessions du flux), planifier: false (aucune
  * tâche de fond).
  */
-export async function demarrer(env = process.env, { log = CONSOLE, options = {} } = {}) {
+export async function demarrer(envBrut = process.env, { log = CONSOLE, options = {} } = {}) {
+  // Les réglages posés par l'assistant complètent l'environnement (qui garde la main).
+  const env = appliquerReglages({ dossier: envBrut.DATA_DIR || SPEC.donnees.defaut, env: envBrut });
   const cfg = lireConfigMapmylan(env);
   const db = ouvrirBase(cfg.donnees);
-  const socle = await demarrerSocle({ service: { id: 'mapmylan', nom: 'MapMyLAN', contactSecurite: CONTACT_SECURITE }, db, dossier: cfg.donnees, env, log });
+  const socle = await demarrerSocle({
+    service: { id: 'mapmylan', nom: 'MapMyLAN', contactSecurite: CONTACT_SECURITE }, db, dossier: cfg.donnees, env, log,
+    assistant: { reglages: REGLAGES_MAPMYLAN, spec: SPEC, version: VERSION, controler: lireConfigMapmylan },
+    version: VERSION, nouveautes: lireNouveautes(new URL('../nouveautes.json', import.meta.url)),
+  });
   const { coffre, journal, portail, comptes, limiteur } = socle;
   // Rotation de SOCLE_CLE : les secrets de MapMyLAN suivent ceux du socle.
   const tour = resceller({ db, coffre });
@@ -201,7 +207,9 @@ export async function demarrer(env = process.env, { log = CONSOLE, options = {} 
   return { serveur, socle, cfg, db, s, api, arreter };
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+// Le processus du conteneur supervise le service et le relance quand
+// l'assistant a posé de nouveaux réglages.
+if (import.meta.url === `file://${process.argv[1]}` && !superviser()) {
   demarrer().then(({ arreter }) => {
     for (const sig of ['SIGTERM', 'SIGINT']) process.on(sig, () => arreter().then(() => process.exit(0)));
   }).catch(e => { console.error(e.message); process.exit(1); });
