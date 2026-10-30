@@ -230,7 +230,7 @@ await page.getByRole('button', { name: 'Créer le compte' }).click();
 await page.getByRole('button', { name: /Créer la clé maintenant/ }).click();
 await page.getByText('J’ai rangé ces codes en lieu sûr.').click();
 await page.getByRole('button', { name: 'Terminer' }).click();
-await passerAssistant(page, { controle });
+await passerAssistant(page, { controle: nom => controle(page, nom) });
 
 // Mise en route : l'équipement est obligatoire et n'est enregistré qu'après
 // une connexion vérifiée, empreinte montrée.
