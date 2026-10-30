@@ -23,6 +23,7 @@ import { chromium } from 'playwright';
 import fs from 'node:fs';
 import crypto from 'node:crypto';
 import { chevauchements, LARGEURS } from '../socle/essai/mise-en-page.mjs';
+import { passerAssistant, ouvrirReglagesService } from '../socle/essai/assistant-navigateur.mjs';
 import { Client } from '../socle/essai/client.js';
 import { codeTotp } from '../socle/essai/inscription.js';
 import { lancer, serveurLocal, JETON_INSTALLATION, ReseauSimule } from '../test/aides.js';
@@ -229,6 +230,7 @@ await page.getByRole('button', { name: 'Créer le compte' }).click();
 await page.getByRole('button', { name: /Créer la clé maintenant/ }).click();
 await page.getByText('J’ai rangé ces codes en lieu sûr.').click();
 await page.getByRole('button', { name: 'Terminer' }).click();
+await passerAssistant(page, { controle });
 
 // Mise en route : l'équipement est obligatoire et n'est enregistré qu'après
 // une connexion vérifiée, empreinte montrée.
