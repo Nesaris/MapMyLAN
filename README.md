@@ -152,7 +152,7 @@ proposée convient pour commencer.
 
 <p align="center"><img src="medias/assistant.png" alt="Assistant de configuration" width="70%"></p>
 
-Réglages demandés : réseau à cartographier, balayage automatique toutes les (secondes), interface réseau du balayage, préfixe de regroupement, adresse d’Ollama, modèle, questions par compte et par jour, questions par jour, tous comptes, questions par compte et par minute, adresse de RAVYN, adresse d’expédition, clé d’envoi RAVYN ; plus ceux de
+Réglages demandés : réseau à cartographier, balayage automatique toutes les (secondes), interface réseau du balayage, préfixe de regroupement, adresse d’Ollama, modèle, questions par compte et par jour, questions par jour, tous comptes, questions par compte et par minute, adresse de Nesmail, adresse d’expédition, clé d’envoi Nesmail ; plus ceux de
 tous les services (adresse publique, relais de confiance, gamme de
 l’interface, contact de sécurité, courriels d’alerte).
 
