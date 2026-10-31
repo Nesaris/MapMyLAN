@@ -67,9 +67,9 @@ export const REGLAGES_MAPMYLAN = [
   { env: 'MAPMYLAN_IA_JOUR', groupe: 'Assistant IA', libelle: 'Questions par compte et par jour', depuis: '2.4.0', avance: true },
   { env: 'MAPMYLAN_IA_JOUR_TOTAL', groupe: 'Assistant IA', libelle: 'Questions par jour, tous comptes', depuis: '2.4.0', avance: true },
   { env: 'MAPMYLAN_IA_MINUTE', groupe: 'Assistant IA', libelle: 'Questions par compte et par minute', depuis: '2.4.0', avance: true },
-  { env: 'POSTE_URL', groupe: 'Courriels (RAVYN)', libelle: 'Adresse de RAVYN', exemple: 'https://ravyn.exemple.org', depuis: '2.4.0', aide: 'Facultatif : alertes envoyées par courriel via RAVYN.' },
-  { env: 'POSTE_FROM', groupe: 'Courriels (RAVYN)', libelle: 'Adresse d’expédition', exemple: 'alertes@exemple.org', depuis: '2.4.0' },
-  { env: 'POSTE_SEND_KEY', groupe: 'Courriels (RAVYN)', libelle: 'Clé d’envoi RAVYN', depuis: '2.4.0' },
+  { env: 'POSTE_URL', groupe: 'Courriels (Nesmail)', libelle: 'Adresse de Nesmail', exemple: 'https://nesmail.exemple.org', depuis: '2.4.0', aide: 'Facultatif : alertes envoyées par courriel via Nesmail.' },
+  { env: 'POSTE_FROM', groupe: 'Courriels (Nesmail)', libelle: 'Adresse d’expédition', exemple: 'alertes@exemple.org', depuis: '2.4.0' },
+  { env: 'POSTE_SEND_KEY', groupe: 'Courriels (Nesmail)', libelle: 'Clé d’envoi Nesmail', depuis: '2.4.0' },
 ];
 
 export function lireConfigMapmylan(env = process.env) {
