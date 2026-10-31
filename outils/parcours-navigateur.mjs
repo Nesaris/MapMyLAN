@@ -21,6 +21,7 @@
 // Playwright et Chromium viennent de l'environnement d'essai, hors du dépôt.
 import { chromium } from 'playwright';
 import fs from 'node:fs';
+import path from 'node:path';
 import crypto from 'node:crypto';
 import { chevauchements, LARGEURS } from '../socle/essai/mise-en-page.mjs';
 import { passerAssistant, ouvrirReglagesService } from '../socle/essai/assistant-navigateur.mjs';
@@ -286,15 +287,36 @@ await geste('mise en route terminée, premier balayage par le flux', async () =>
   for (let i = 0; i < 60; i++) mesure.run(crypto.randomUUID(), 18 + 10 * Math.sin(i / 6) + (i % 7), 38 + 4 * Math.sin(i / 11), 3100 + i * 3, 8000, 57, 47, 0.6, 100 + (i % 9) * 12, 30 + (i % 5) * 6, 864000 + i * 60, t - (60 - i) * 60e3);
   const flux = o.db.prepare(`INSERT INTO flux_trafic(id, srcIp, dstIp, port, proto, firstSeen, lastSeen, bytes, packets, hits, host, domain, operator, logo, country, direction, suspect, raison)
     VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`);
-  const destinations = [
-    ['203.0.113.10', 'cdg-edge-3.exemple.org', 'FR'], ['203.0.113.20', 'fra-cache-1.exemple.org', 'DE'], ['203.0.113.30', 'nrt-a.exemple.org', 'JP'],
-    ['203.0.113.40', 'iad-web-2.exemple.org', 'US'], ['203.0.113.50', null, 'NL'], ['203.0.113.60', 'syd-b.exemple.org', 'AU'],
+  // PARCOURS_VITRINE=1 (captures de présentation) : de vrais services, nommés
+  // comme leurs serveurs se nomment eux-mêmes (code d'aéroport dans le nom).
+  // L'adresse suspecte reste une adresse de documentation.
+  const destinations = process.env.PARCOURS_VITRINE === '1' ? [
+    ['142.250.179.110', 'par21s04-in-f14.1e100.net', '1e100.net', 'Google', 'google.com', 'US', 443],
+    ['140.82.121.4', 'lb-140-82-121-4-fra.github.com', 'github.com', 'GitHub', 'github.com', 'US', 443],
+    ['18.160.41.9', 'server-18-160-41-9.nrt57.r.cloudfront.net', 'cloudfront.net', 'Amazon CloudFront', 'aws.amazon.com', 'US', 443],
+    ['13.107.42.14', 'iad06-edge.a-msedge.net', 'a-msedge.net', 'Microsoft', 'microsoft.com', 'US', 443],
+    ['203.0.113.50', null, null, null, null, 'NL', 23],
+    ['17.253.83.205', 'syd1-vip-bx-002.aaplimg.com', 'aaplimg.com', 'Apple', 'apple.com', 'US', 443],
+    ['45.57.90.1', 'ipv4-c012-cdg001-ix.1.oca.nflxvideo.net', 'nflxvideo.net', 'Netflix', 'netflix.com', 'US', 443],
+  ] : [
+    ['203.0.113.10', 'cdg-edge-3.exemple.org', 'exemple.org', null, null, 'FR', 443], ['203.0.113.20', 'fra-cache-1.exemple.org', 'exemple.org', null, null, 'DE', 443],
+    ['203.0.113.30', 'nrt-a.exemple.org', 'exemple.org', null, null, 'JP', 80], ['203.0.113.40', 'iad-web-2.exemple.org', 'exemple.org', null, null, 'US', 443],
+    ['203.0.113.50', null, null, 'Réseau de documentation', null, 'NL', 23], ['203.0.113.60', 'syd-b.exemple.org', 'exemple.org', null, null, 'AU', 443],
   ];
-  destinations.forEach(([dst, hote, pays], i) => {
+  // Logos fournis à part (LOGOS_VITRINE : dossier de <domaine>.png), rangés
+  // dans le cache du service : la vitrine ne sort pas les chercher.
+  if (process.env.PARCOURS_VITRINE === '1' && process.env.LOGOS_VITRINE && fs.existsSync(process.env.LOGOS_VITRINE)) {
+    o.s.reglages.poser('world.logos', true);
+    o.s.reglages.poser('world.origin', '48.86,2.35,Paris');
+    for (const f of fs.readdirSync(process.env.LOGOS_VITRINE).filter(f => f.endsWith('.png'))) {
+      o.s.logos.ranger(f.slice(0, -4), { type: 'image/png', corps: fs.readFileSync(path.join(process.env.LOGOS_VITRINE, f)), expire: Date.now() + 30 * 86400e3 });
+    }
+  }
+  destinations.forEach(([dst, hote, domaine, operateur, logo, pays, port], i) => {
     for (const [j, src] of ['192.0.2.10', '192.0.2.60', '192.0.2.40'].entries()) {
-      const suspect = src === '192.0.2.40' && i === 4;
-      flux.run(crypto.randomUUID(), src, dst, [443, 443, 80, 443, 23, 443][i], 'tcp', t - (i + j + 1) * 7 * 60e3, t - (i + j) * 60e3, 40000 * (i + 1) * (j + 1), 60 * (i + 1), 3 + i,
-        hote, hote ? 'exemple.org' : null, hote ? null : 'Réseau de documentation', null, pays, 'sortant', suspect ? 1 : 0, suspect ? 'Telnet vers l’extérieur' : null);
+      const suspect = src === '192.0.2.40' && port === 23;
+      flux.run(crypto.randomUUID(), src, dst, port, 'tcp', t - (i + j + 1) * 7 * 60e3, t - (i + j) * 60e3, 40000 * (i + 1) * (j + 1), 60 * (i + 1), 3 + i,
+        hote, domaine, operateur, logo, pays, 'sortant', suspect ? 1 : 0, suspect ? 'Telnet vers l’extérieur' : null);
     }
   });
 }
