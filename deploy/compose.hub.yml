@@ -7,7 +7,7 @@ services:
   # L'API n'écoute que sur l'adresse du pont (BIND_ADDRESS) : le réseau local
   # ne l'atteint pas, le relais ci-dessous si.
   api:
-    image: ghcr.io/codexx64/mapmylan:{{config.IMAGE_TAG}}
+    image: ghcr.io/nesaris/mapmylan:{{config.IMAGE_TAG}}
     container_name: {{service.host}}-api
     restart: unless-stopped
     network_mode: host
@@ -94,7 +94,7 @@ services:
   # Le relais : même image, sur le réseau du Hub, qui transmet chaque requête
   # à l'API (flux temps réel compris). Il ne décide rien.
   relais:
-    image: ghcr.io/codexx64/mapmylan:{{config.IMAGE_TAG}}
+    image: ghcr.io/nesaris/mapmylan:{{config.IMAGE_TAG}}
     container_name: {{service.host}}
     restart: unless-stopped
     command: ["node", "src/relais.js"]
