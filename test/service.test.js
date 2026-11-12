@@ -746,7 +746,7 @@ test('comptes depuis le Hub : manifeste et Compose relient le jeton d’administ
 });
 
 test('thème : la page porte celui de SOCLE_THEME, posé par la page Thème du Hub ; SOMA hors Hub', async () => {
-  assert.match((await new Client(o.port).get('/')).texte, /<html lang="fr" data-shell="reading" data-gamme="soma">/);
+  assert.match((await new Client(o.port).get('/')).texte, /<html lang="fr" data-shell="reading" data-gamme="soma" data-disposition="gauche" data-disposition-defaut="gauche">/);
   const x = await lancer({ SOCLE_THEME: 'console' });
   try {
     for (const chemin of ['/', '/carte']) assert.match((await new Client(x.port).get(chemin)).texte, /data-gamme="console"/, chemin);
@@ -754,9 +754,10 @@ test('thème : la page porte celui de SOCLE_THEME, posé par la page Thème du H
   await assert.rejects(() => lancer({ SOCLE_THEME: 'clair' }), /SOCLE_THEME/);
   const lire = f => readFileSync(new URL(`../${f}`, import.meta.url), 'utf8');
   assert.match(lire('deploy/compose.hub.yml'), /^ {6}SOCLE_THEME: "\{\{hub\.theme\}\}"$/m);
+  assert.match(lire('deploy/compose.hub.yml'), /^ {6}SOCLE_DISPOSITION: "\{\{hub\.disposition\}\}"$/m);
   const manifeste = JSON.parse(lire('hub.json'));
   assert.equal(manifeste.config.find(c => c.key === 'SOCLE_THEME'), undefined, 'le thème ne se règle plus dans la configuration du service');
-  assert.equal(manifeste.minHubVersion, '0.7.0', '{{hub.theme}} vient avec le Hub 0.7.0');
+  assert.equal(manifeste.minHubVersion, '0.17.0', '{{hub.disposition}} vient avec le Hub 0.17.0');
 });
 
 test('VIGIE : jetons dérivés par le Hub (seul celui de VIGIE agit), page Vigie relayée avec le jeton de MapMyLAN', async () => {

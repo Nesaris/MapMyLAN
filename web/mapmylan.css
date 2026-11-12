@@ -1377,3 +1377,6 @@ td.coupe-cellule{max-width:0;width:40%;white-space:nowrap;overflow:hidden;text-o
 .vg-legende b{font-weight:600;color:var(--ink)}
 .vg-pastille{width:9px;height:9px;border-radius:3px;display:inline-block}
 .vg-synthese{padding:12px 18px 16px;font-size:13px;color:var(--ink-soft);line-height:1.55;white-space:pre-line;overflow-wrap:anywhere;border-top:1px solid var(--hair-soft)}
+/* Mode atelier : son propre cadre, sans le rail ; la position du menu (en
+   barre, haut ou bas) ne s'applique qu'au mode lecture. */
+html[data-shell="workshop"]:is([data-disposition="haut"],[data-disposition="bas"]) .body{display:flex}

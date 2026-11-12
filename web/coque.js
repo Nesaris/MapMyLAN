@@ -17,6 +17,7 @@ import { E, api, choisirPage, choisirAppareil, changerDisposition, lancerBalayag
 import { t, langue, changerLangue } from './i18n.js';
 import { boutonAssistant, basculer as basculerAssistant } from './assistant/panneau.js';
 import { estSombre, appliquerTheme } from '/socle/compte.js';
+import { installerDisposition } from '/socle/disposition.js';
 
 // Le raccourci de la palette, tel que le clavier de la machine le nomme.
 const RACCOURCI = /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent) ? '⌘K' : 'Ctrl K';
@@ -463,6 +464,8 @@ export function coque(p) {
   p.suivre('page', marquer);
   marquer();
   document.body.prepend(app);
+// Le menu à gauche, en haut, en bas ou à droite : réglé dans le Hub, ou par chacun (bouton de la barre du haut, appui long sur le menu).
+installerDisposition({ rail: app.querySelector('nav.rail') });
   p.au(() => app.remove());
   return stage;
 }

@@ -230,6 +230,7 @@ invalide arrête MapMyLAN au démarrage avec la liste des erreurs.
 | `EXTENSIONS_DIR` | dossier des extensions (lecture seule) | — |
 | `MAPMYLAN_V1_MASTER_KEY` | reprise de la 1.4.1 seulement | — |
 | `SOCLE_THEME` | thème de l'interface : `console` (noir et vert, ou blanc et bleu par la bascule clair ou sombre) ou `soma` (clair ou sombre) ; dans le Hub, choisi dans la page Thème du Hub (une gamme pour tout, ou une par service) | `soma` |
+| `SOCLE_DISPOSITION` | position du menu : `gauche`, `haut`, `bas` ou `droite` ; dans le Hub, choisie dans la page Thème. Chacun peut en choisir une autre dans l'interface (bouton à côté de clair ou sombre, ou appui long sur le menu puis glisser vers un bord) | `gauche` |
 | `SOCLE_JETON_ADMIN_HUB` | jeton d'administration des comptes par le Hub (Comptes des services) ; dans le Hub, généré (`HUB_ADMIN_TOKEN`) | — |
 | `SOCLE_*` | comptes, clé maîtresse, poivre, relais SMTP des alertes, relais de confiance : voir le socle | — |
 
