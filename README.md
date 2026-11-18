@@ -22,7 +22,7 @@
 
 </p>
 
-<p align="center"><a href="README.fr.md">🇫🇷 Documentation complète en français</a> · <a href="https://nesaris.github.io">Nesaris Network</a></p>
+<p align="center"><a href="README.fr.md">Full documentation</a> · <a href="https://nesaris.github.io">Nesaris Network</a></p>
 
 ## Why MapMyLAN?
 
@@ -60,7 +60,7 @@ docker compose logs mapmylan | grep "Jeton d'installation"   # one-time setup to
 
 Open `http://<host>:8090`, paste the setup token, create your account. Or install it from the [Nesaris Hub](https://github.com/Nesaris/Hub) catalog.
 
-Full documentation (configuration, backups, key rotation, reverse proxy, upgrades) is in **[README.fr.md](README.fr.md)** (French).
+Full documentation (configuration, backups, key rotation, reverse proxy, upgrades) is in **[README.fr.md](README.fr.md)**.
 
 ## Part of Nesaris Network
 
