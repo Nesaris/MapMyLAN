@@ -1,9 +1,10 @@
 [
   {
-    "version": "2.6.0",
+    "version": "2.6.1",
     "date": "2026-11-23",
     "points": [
-      "L’assistant de MapMyLAN répond aussi au Hub : l’IA du Hub (et tes bots Telegram) peut lui poser une question sur ton réseau."
+      "L’assistant de MapMyLAN répond aussi au Hub : l’IA du Hub (et tes bots Telegram) peut lui poser une question sur ton réseau.",
+      "Correctif de sécurité : l’image passe à Node 24.22.3 et aux paquets Debian corrigés de novembre."
     ]
   },
   {
