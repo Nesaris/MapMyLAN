@@ -31,14 +31,14 @@ services:
         max-file: "5"
     volumes:
       - {{volume.data}}:/app/data
-      - /proc:/host/proc:ro
-      - /sys:/host/sys:ro
     environment:
       DATA_DIR: /app/data
       HOTE: "{{config.BIND_ADDRESS}}"
       PORT: "8090"
-      HOST_PROC: /host/proc
-      HOST_SYS: /host/sys
+      # Réseau de l'hôte : /proc/net et /sys/class/net du conteneur sont ceux de l'hôte,
+      # et /proc/stat, meminfo, loadavg, uptime ne sont pas cloisonnés. Aucun montage de l'hôte.
+      HOST_PROC: /proc
+      HOST_SYS: /sys
       SCAN_INTERFACE: "{{config.SCAN_INTERFACE}}"
       SCAN_SUBNET: "{{config.SCAN_SUBNET}}"
       SCAN_INTERVAL: "{{config.SCAN_INTERVAL}}"

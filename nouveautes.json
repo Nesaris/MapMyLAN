@@ -1,5 +1,12 @@
 [
   {
+    "version": "2.6.2",
+    "date": "2026-11-23",
+    "points": [
+      "Plus aucun montage de l’hôte (/proc, /sys) : les mesures de la machine se lisent depuis le réseau de l’hôte. Le Hub accepte de nouveau la mise à jour."
+    ]
+  },
+  {
     "version": "2.6.1",
     "date": "2026-11-23",
     "points": [
