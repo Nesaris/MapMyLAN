@@ -19,7 +19,9 @@ export function routesAssistant(route, s) {
   const { assistant, liaisons, plafond, plafondVoix } = s;
   const parMinute = new Debit({ max: s.cfg.iaMinute });
   const voix = new Debit({ max: 20 });
-  const qui = ctx => `compte:${ctx.acteur.compte}`;
+  // Le Hub (jeton d'intégration) peut poser une question, comme un compte : son fil n'est pas gardé.
+  const cle = ctx => ctx.acteur.compte || ctx.acteur.id;
+  const qui = ctx => ctx.acteur.compte ? `compte:${ctx.acteur.compte}` : ctx.acteur.id;
   const payer = ctx => () => {
     if (!plafond.prendre(qui(ctx))) throw new ErreurHttp(429, 'Plafond journalier de l’assistant atteint : réessaie demain, les administrateurs sont prévenus.');
   };
@@ -28,21 +30,21 @@ export function routesAssistant(route, s) {
   };
 
   route.get('/api/assistant', async ctx => {
-    const fil = assistant.fil(ctx.acteur.compte);
+    const fil = assistant.fil(cle(ctx));
     return {
-      fil, encours: assistant.occupe(ctx.acteur.compte),
+      fil, encours: assistant.occupe(cle(ctx)),
       ia: { prete: liaisons.iaPrete, modele: liaisons.modele || null },
       voix: await liaisons.etatVoix(),
       cerveau: { synapse: liaisons.synapsePrete, nom: liaisons.nomCerveau },
       relances: relances(prendrePhoto(s), fil),
       quota: { jour: s.cfg.iaJour, restant: plafond.restant(qui(ctx)) },
     };
-  }, { role: 'lecture' });
+  }, { role: 'lecture', jeton: true });
 
   route.post('/api/assistant/ask', ctx => {
-    if (!parMinute.prendre(ctx.acteur.compte)) throw new ErreurHttp(429, 'Trop de questions d’affilée : attends une minute.');
-    return relayer(() => assistant.demander(ctx.acteur.compte, ctx.corps.text, { voix: ctx.corps.voix === true, payer: payer(ctx) }));
-  }, { role: 'lecture', corps: { text: { type: 'chaine', requis: true, min: 1, max: 2000 }, voix: { type: 'booleen' } } });
+    if (!parMinute.prendre(cle(ctx))) throw new ErreurHttp(429, 'Trop de questions d’affilée : attends une minute.');
+    return relayer(() => assistant.demander(cle(ctx), ctx.corps.text, { voix: ctx.corps.voix === true, payer: payer(ctx) }));
+  }, { role: 'lecture', jeton: true, corps: { text: { type: 'chaine', requis: true, min: 1, max: 2000 }, voix: { type: 'booleen' } } });
 
   route.post('/api/assistant/stop', ctx => ({ arrete: assistant.arreter(ctx.acteur.compte) }), { role: 'lecture', corps: vide });
   route.post('/api/assistant/nouvelle', ctx => { assistant.oublier(ctx.acteur.compte); return { ok: true }; }, { role: 'lecture', corps: vide });

@@ -83,6 +83,7 @@ test('autorisation : politique écrite ici, puis chaque route balayée sans sess
     'GET /api/vlans', 'GET /api/topology', 'POST /api/topology/auto-build', 'GET /api/stats', 'GET /api/alerts', 'POST /api/alerts/x/ack', 'GET /api/host/stats',
     'GET /api/traffic/flows', 'GET /api/traffic/aggregats', 'GET /api/traffic/state',
     'GET /api/passerelle', 'GET /api/passerelle/ips', 'PUT /api/passerelle/bouclier',
+    'GET /api/assistant', 'POST /api/assistant/ask',
   ];
   const trie = l => [...l].sort();
   assert.deepEqual(trie(routes.filter(x => x.o.role === 'admin').map(x => x.cle)), trie(ADMIN));

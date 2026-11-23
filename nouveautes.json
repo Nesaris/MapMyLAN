@@ -1,5 +1,12 @@
 [
   {
+    "version": "2.6.0",
+    "date": "2026-11-23",
+    "points": [
+      "L’assistant de MapMyLAN répond aussi au Hub : l’IA du Hub (et tes bots Telegram) peut lui poser une question sur ton réseau."
+    ]
+  },
+  {
     "version": "2.5.0",
     "date": "2026-11-12",
     "points": [

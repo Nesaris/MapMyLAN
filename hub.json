@@ -3,7 +3,7 @@
   "manifestVersion": 1,
   "id": "mapmylan",
   "name": "MapMyLAN",
-  "version": "2.5.0",
+  "version": "2.6.0",
   "description": "Cartographie du réseau local : appareils, balayages, scores de risque, alertes, quarantaine — et un assistant qui répond, au clavier ou à voix haute avec VOX.",
   "icon": "map",
   "repository": "https://github.com/codexX64/MapMyLAN",
@@ -54,7 +54,7 @@
       "key": "IMAGE_TAG",
       "label": "Version de l'image",
       "type": "string",
-      "default": "2.5.0",
+      "default": "2.6.0",
       "help": "Étiquette des images publiées sur ghcr.io."
     },
     {
@@ -956,6 +956,36 @@
       "sample": {
         "created": 11,
         "deleted": 9
+      }
+    },
+    {
+      "id": "assistant.ask",
+      "name": "Poser une question à l’assistant",
+      "description": "Pose une question à l’IA de MapMyLAN, qui répond avec l’état réel du réseau (appareils, alertes, trafic). Lecture seule.",
+      "icon": "sparkle",
+      "group": "Assistant",
+      "params": [
+        {
+          "key": "question",
+          "label": "Question",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "path": "/api/assistant/ask",
+        "body": {
+          "text": "{{params.question}}"
+        }
+      },
+      "risk": "read",
+      "idempotent": false,
+      "output": {
+        "type": "object"
+      },
+      "sample": {
+        "reply": "3 appareils sont hors ligne : nas, camera-entree, poste-bureau."
       }
     }
   ],

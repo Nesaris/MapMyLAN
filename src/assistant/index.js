@@ -210,6 +210,8 @@ export class Assistant {
   }
 
   garder(compte, tour) {
+    // Une question du Hub (jeton) n'ouvre pas de fil : elle n'appartient à aucun compte.
+    if (String(compte).startsWith('jeton:')) return;
     const { db } = this.s;
     db.prepare('INSERT INTO assistant_tours(id, compte, t, tour) VALUES(?,?,?,?)').run(tour.id, compte, Date.now(), JSON.stringify(tour));
     db.prepare('DELETE FROM assistant_tours WHERE compte = ? AND id NOT IN (SELECT id FROM assistant_tours WHERE compte = ? ORDER BY t DESC LIMIT ?)').run(compte, compte, MAX_FIL);
