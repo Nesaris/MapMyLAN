@@ -3,12 +3,12 @@
   "manifestVersion": 1,
   "id": "mapmylan",
   "name": "MapMyLAN",
-  "version": "2.6.2",
+  "version": "2.6.3",
   "description": "Cartographie du réseau local : appareils, balayages, scores de risque, alertes, quarantaine — et un assistant qui répond, au clavier ou à voix haute avec VOX.",
   "icon": "map",
   "repository": "https://github.com/codexX64/MapMyLAN",
   "license": "MIT",
-  "minHubVersion": "0.17.0",
+  "minHubVersion": "0.24.0",
   "install": {
     "type": "compose",
     "compose": "deploy/compose.hub.yml",
@@ -54,7 +54,7 @@
       "key": "IMAGE_TAG",
       "label": "Version de l'image",
       "type": "string",
-      "default": "2.6.2",
+      "default": "2.6.3",
       "help": "Étiquette des images publiées sur ghcr.io."
     },
     {
@@ -63,6 +63,7 @@
       "type": "string",
       "required": true,
       "default": "eth0",
+      "detect": "host.interface",
       "help": "Celle qui porte le segment à cartographier, jamais une interface Docker."
     },
     {
@@ -71,6 +72,7 @@
       "type": "string",
       "required": true,
       "default": "198.51.100.0/24",
+      "detect": "host.subnet",
       "help": "D'autres plages s'ajoutent ensuite depuis MapMyLAN."
     },
     {
@@ -154,6 +156,7 @@
           "label": "Oui — réseau de confiance, mode dégradé"
         }
       ],
+      "detect": "hub.http",
       "help": "Les clés d'accès n'existent qu'en HTTPS. En mode dégradé, l'administrateur se connecte avec mot de passe et application d'authentification, et MapMyLAN l'affiche partout."
     },
     {

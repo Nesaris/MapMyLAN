@@ -758,7 +758,8 @@ test('thème : la page porte celui de SOCLE_THEME, posé par la page Thème du H
   assert.match(lire('deploy/compose.hub.yml'), /^ {6}SOCLE_DISPOSITION: "\{\{hub\.disposition\}\}"$/m);
   const manifeste = JSON.parse(lire('hub.json'));
   assert.equal(manifeste.config.find(c => c.key === 'SOCLE_THEME'), undefined, 'le thème ne se règle plus dans la configuration du service');
-  assert.equal(manifeste.minHubVersion, '0.17.0', '{{hub.disposition}} vient avec le Hub 0.17.0');
+  const [ma, mi] = manifeste.minHubVersion.split('.').map(Number);
+  assert.ok(ma > 0 || mi >= 17, '{{hub.disposition}} vient avec le Hub 0.17.0');
 });
 
 test('VIGIE : jetons dérivés par le Hub (seul celui de VIGIE agit), page Vigie relayée avec le jeton de MapMyLAN', async () => {

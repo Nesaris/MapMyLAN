@@ -1,5 +1,12 @@
 [
   {
+    "version": "2.6.3",
+    "date": "2026-11-26",
+    "points": [
+      "Installation depuis le Hub sans rien remplir : la carte réseau, la plage à balayer et le mode HTTPS sont trouvés par le Hub (0.24.0 ou plus récent)."
+    ]
+  },
+  {
     "version": "2.6.2",
     "date": "2026-11-23",
     "points": [
