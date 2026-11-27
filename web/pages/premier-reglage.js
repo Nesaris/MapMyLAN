@@ -8,16 +8,18 @@
 // n'est enregistré tant que la connexion n'a pas répondu. L'empreinte que
 // l'équipement présente (clé d'hôte SSH, certificat TLS auto-signé) est
 // montrée avant l'enregistrement : enregistrer, c'est lui faire confiance, et
-// elle sera vérifiée à chaque connexion. Le reste — messagerie, courrier — se
-// passe, et se règle plus tard.
+// elle sera vérifiée à chaque connexion. C'est tout l'essentiel : le reste
+// (alertes, carte) est déjà réglé, présenté pas à pas, et se passe d'un clic.
+// Le décor est celui de la porte du socle : les mains givrées.
 import { h, s, remplir } from '../dom.js';
 import { api } from '../etat.js';
 import { t } from '../i18n.js';
 import { basculerTheme } from '../coque.js';
 
-const ETAPES = ['accueil', 'equipement', 'verif', 'telegram', 'courrier', 'topologie', 'fin'];
-/** Étapes que « Passer cette étape » saute : les canaux d'alerte. */
-const FACULTATIVES = new Set([3, 4]);
+const ETAPES = ['equipement', 'verif', 'apercu', 'telegram', 'courrier', 'topologie', 'fin'];
+const APERCU = 2;
+/** Étapes facultatives, que « Passer cette étape » saute. */
+const FACULTATIVES = new Set([3, 4, 5]);
 
 // Les identifiants doivent correspondre exactement à ceux des adaptateurs du
 // serveur. UniFi parle à l'API locale en HTTPS ; tous les autres en SSH.
@@ -51,7 +53,7 @@ const noteOb = (classe, icone, texte) => h('div', { class: classe ? `ob-note ${c
 /** Rend une promesse résolue quand la configuration est terminée. */
 export function premierReglage() {
   return new Promise(resolve => {
-    let etape = 0, verdict = null, occupe = false, erreur = '';
+    let etape = 0, verdict = null, occupe = false, erreur = '', optionsOuvertes = false;
     const d = {
       router: { name: 'Routeur principal', host: '', port: 443, username: 'admin', password: '', privateKey: '', passphrase: '', useKey: false, vendor: 'unifi', apiBaseUrl: '', site: 'default' },
       telegram: { enabled: false, token: '', chatId: '' },
@@ -74,6 +76,8 @@ export function premierReglage() {
           pas),
         corps, pied));
     document.body.append(racine);
+    let givre = null;
+    import('/socle/givre.js').then(m => { if (racine.isConnected) givre = m.poserGivre(racine, racine.querySelector('.ob-wiz')); }).catch(() => { /* fond ordinaire */ });
 
     // L'adresse de l'équipement est devinée depuis la plage balayée : dans la
     // très grande majorité des installations, la passerelle est en .1.
@@ -81,7 +85,7 @@ export function premierReglage() {
       const plage = x?.['scan.subnet'];
       if (!plage || r.host) return;
       r.host = plage.split('/')[0].split('.').slice(0, 3).join('.') + '.1';
-      if (etape === 1) peindre();
+      if (etape === 0) peindre();
     }).catch(() => { /* l'adresse reste à saisir */ });
 
     const parApi = () => estApi(r.vendor);
@@ -113,15 +117,15 @@ export function premierReglage() {
         }
         // Même en cas d'échec on avance : l'écran suivant explique ce qui
         // s'est passé, et il porte le bouton qui réessaie.
-        etape = 2;
+        etape = 1;
       } catch (e) {
-        if (e.status === 409 || e.status === 502) { verdict = { ok: false, error: e.message }; etape = 2; }
+        if (e.status === 409 || e.status === 502) { verdict = { ok: false, error: e.message }; etape = 1; }
         else erreur = e.message;
       } finally { occupe = false; peindre(); }
     };
     const enregistrer = async () => {
       occupe = true; erreur = ''; peindre();
-      try { await api.put('/api/router', { ...identifiants(verdict?.empreinte), name: r.name }); etape = 3; }
+      try { await api.put('/api/router', { ...identifiants(verdict?.empreinte), name: r.name }); etape = APERCU; }
       catch (e) { erreur = e.message; }
       finally { occupe = false; peindre(); }
     };
@@ -132,8 +136,9 @@ export function premierReglage() {
         if (d.email.enabled) await api.put('/api/notifications/email', { enabled: true, config: { provider: d.email.provider, address: d.email.address, password: d.email.password } });
         await api.put('/api/settings/topology.autoBuild', { value: d.autoTopology });
         await api.post('/api/setup/complete');
-        racine.classList.add('parti');
-        setTimeout(() => racine.remove(), 550);
+        // Avec le givre, les deux mains se touchent avant que l'assistant s'efface.
+        if (givre) { givre.toucher(true); racine.classList.add('fin'); setTimeout(() => { givre.arreter(); racine.remove(); }, 1400); }
+        else { racine.classList.add('parti'); setTimeout(() => racine.remove(), 550); }
         // Balayage et carte partent en arrière-plan : leur échec s'inscrit au
         // journal du service, et le bouton de balayage reste là.
         api.post('/api/devices/scan', {}).catch(() => { /* voir ci-dessus */ });
@@ -142,19 +147,25 @@ export function premierReglage() {
       } catch (e) { erreur = e.message; occupe = false; peindre(); }
     };
     const suivant = () => {
-      if (etape === 1) return verifier();
-      if (etape === 2) { if (verdict?.ok) return enregistrer(); etape = 1; return peindre(); }
-      if (etape === ETAPES.length - 1) return terminer();
+      if (etape === 0) return verifier();
+      if (etape === 1) { if (verdict?.ok) return enregistrer(); etape = 0; return peindre(); }
+      if (etape === APERCU || etape === ETAPES.length - 1) return terminer();
       etape = Math.min(ETAPES.length - 1, etape + 1);
       peindre();
     };
     // Passer une étape de canal d'alerte le désactive : sauter n'est pas
-    // « garder ce qui est saisi », c'est renoncer pour l'instant.
-    const passer = () => { (etape === 3 ? d.telegram : d.email).enabled = false; etape += 1; peindre(); };
+    // « garder ce qui est saisi », c'est renoncer pour l'instant. Passer la
+    // carte garde le choix proposé (construite toute seule).
+    const passer = () => {
+      if (etape === 3) d.telegram.enabled = false;
+      if (etape === 4) d.email.enabled = false;
+      if (etape === 5) d.autoTopology = true;
+      etape += 1; peindre();
+    };
     const libelle = () => {
-      if (etape === 0) return t('ob.btn.start');
-      if (etape === 1) return t('ob.btn.verify');
-      if (etape === 2) return verdict?.ok ? t('ob.btn.save') : t('ob.btn.retry');
+      if (etape === 0) return t('ob.btn.verify');
+      if (etape === 1) return verdict?.ok ? t('ob.btn.save') : t('ob.btn.retry');
+      if (etape === APERCU) return t('ob.overview.finish');
       if (etape === ETAPES.length - 1) return t('ob.btn.open');
       return t('ob.btn.next');
     };
@@ -172,11 +183,6 @@ export function premierReglage() {
 
     function contenu() {
       if (etape === 0) return [
-        h('h1', { text: t('ob.welcome.title') }), h('p', { class: 'sub', text: t('ob.welcome.sub') }),
-        h('ul', { class: 'ob-liste' }, ['router', 'check', 'alerts', 'topo'].map((k, i) => h('li', {},
-          h('span', { class: 'c', text: String(i + 1) }), h('span', {}, h('b', { class: 'moyen', text: t(`ob.welcome.${k}.t`) }), ' ', t(`ob.welcome.${k}.d`))))),
-      ];
-      if (etape === 1) return [
         h('h1', { text: t('ob.router.title') }), h('p', { class: 'sub', text: t('ob.router.sub') }),
         groupe(t('ob.router.vendor'), choixOb(CONSTRUCTEURS, r.vendor, v => {
           // Le port suit le transport, tant que l'utilisateur n'a pas saisi
@@ -186,22 +192,25 @@ export function premierReglage() {
           if (parDefaut) r.port = estApi(v) ? 443 : 22;
           peindre();
         }, t('ob.router.vendor'))),
-        groupe(t('ob.router.name'), champOb(r, 'name', { sans: true, aria: t('ob.router.name') })),
-        h('div', { class: 'ob-grp ob-row3' },
-          h('div', {}, h('label', { class: 'ob-lbl', text: t('ob.router.host') }), champOb(r, 'host', { placeholder: '192.0.2.1', aria: t('ob.router.host') }), h('div', { class: 'ob-hint', text: t('ob.router.hostHint') })),
-          h('div', {}, h('label', { class: 'ob-lbl', text: parApi() ? t('ob.router.portApi') : t('ob.router.portSsh') }), champOb(r, 'port', { lire: x => parseInt(x) || 0, aria: 'Port' }))),
+        groupe(t('ob.router.host'), champOb(r, 'host', { placeholder: '192.0.2.1', aria: t('ob.router.host') }), t('ob.router.hostHint')),
         groupe(t('ob.router.user'), champOb(r, 'username', { aria: t('ob.router.user') })),
-        parApi() ? [
-          groupe(t('ob.router.ctrl'), champOb(r, 'apiBaseUrl', { placeholder: `https://${r.host || '192.0.2.1'}`, aria: t('ob.router.ctrl') }), t('ob.router.ctrlHint')),
-          groupe(t('ob.router.site'), champOb(r, 'site', { placeholder: 'default', aria: t('ob.router.site') })),
-        ] : bascule(r.useKey, t('ob.router.useKey'), t('ob.router.useKeyHint'), () => { r.useKey = !r.useKey; peindre(); }),
+        parApi() ? null : bascule(r.useKey, t('ob.router.useKey'), t('ob.router.useKeyHint'), () => { r.useKey = !r.useKey; peindre(); }),
         r.useKey && !parApi()
           ? [groupe(t('ob.router.key'), champOb(r, 'privateKey', { multiligne: true, placeholder: '-----BEGIN OPENSSH PRIVATE KEY-----\n…', aria: t('ob.router.key') })),
             groupe(t('ob.router.passphrase'), champOb(r, 'passphrase', { type: 'password', aria: t('ob.router.passphrase') }))]
           : groupe(t('ob.router.password'), champOb(r, 'password', { type: 'password', aria: t('ob.router.password') })),
+        // Le reste a une valeur qui convient presque toujours : rangé, ouvert à la demande.
+        h('details', { class: 'ob-plus', open: optionsOuvertes, ontoggle: ev => { optionsOuvertes = ev.currentTarget.open; } },
+          h('summary', { text: t('ob.router.more') }),
+          groupe(t('ob.router.name'), champOb(r, 'name', { sans: true, aria: t('ob.router.name') })),
+          groupe(parApi() ? t('ob.router.portApi') : t('ob.router.portSsh'), champOb(r, 'port', { lire: x => parseInt(x) || 0, aria: 'Port' })),
+          parApi() ? [
+            groupe(t('ob.router.ctrl'), champOb(r, 'apiBaseUrl', { placeholder: `https://${r.host || '192.0.2.1'}`, aria: t('ob.router.ctrl') }), t('ob.router.ctrlHint')),
+            groupe(t('ob.router.site'), champOb(r, 'site', { placeholder: 'default', aria: t('ob.router.site') })),
+          ] : null),
         parApi() ? noteOb('', IcoInfo, t('ob.router.unifi')) : null,
       ];
-      if (etape === 2) {
+      if (etape === 1) {
         const e = verdict?.empreinte;
         return [
           h('h1', { text: verdict?.ok ? t('ob.verify.titleOk') : t('ob.verify.titleKo') }), h('p', { class: 'sub', text: t('ob.verify.sub') }),
@@ -214,6 +223,18 @@ export function premierReglage() {
             h('code', { class: 'coupe', text: e.empreinteHote || e.empreinteTls }),
             h('div', { class: 'ob-hint', text: "Compare-la avec celle que l'équipement affiche lui-même : enregistrer revient à lui faire confiance, et elle sera vérifiée à chaque connexion." })) : null,
           verdict?.ok ? noteOb('ok', IcoBouclier, t('ob.verify.crypto')) : noteOb('w', IcoAlerte, t('ob.verify.advice')),
+        ];
+      }
+      if (etape === APERCU) {
+        // Le reste, déjà réglé : chaque ligne mène à son étape.
+        const ligne = (n, titre, etat) => h('button', { class: 'ob-opt', type: 'button', onclick: () => { etape = n; peindre(); } },
+          h('div', { class: 'grow' }, h('b', { text: titre }), h('p', { text: etat })), trait(15, s('path', { d: 'M9 5l7 7-7 7' })));
+        return [
+          h('h1', { text: t('ob.overview.title') }), h('p', { class: 'sub', text: t('ob.overview.sub') }),
+          h('div', { class: 'ob-choix' },
+            ligne(3, t('ob.overview.tg'), d.telegram.enabled ? t('ob.overview.on') : t('ob.overview.off')),
+            ligne(4, t('ob.overview.mail'), d.email.enabled ? t('ob.overview.on') : t('ob.overview.off')),
+            ligne(5, t('ob.overview.topo'), d.autoTopology ? t('ob.overview.auto') : t('ob.overview.manual'))),
         ];
       }
       if (etape === 3) return [
@@ -259,11 +280,12 @@ export function premierReglage() {
     }
 
     function peindrePied() {
-      const bloque = occupe || (etape === 1 && incomplet());
+      const bloque = occupe || (etape === 0 && incomplet());
       remplir(pied,
         h('button', { class: etape === 0 || occupe ? 'ob-back masque' : 'ob-back', type: 'button', onclick: () => { etape = Math.max(0, etape - 1); peindre(); } },
           trait(15, s('path', { d: 'M15 5l-7 7 7 7' })), t('ob.back')),
         FACULTATIVES.has(etape) ? h('button', { class: 'ob-passer', type: 'button', onclick: passer }, t('ob.skip')) : null,
+        etape === APERCU && !occupe ? h('button', { class: 'ob-passer', type: 'button', onclick: () => { etape = 3; peindre(); } }, t('ob.overview.stepwise')) : null,
         h('button', { class: 'ob-next', type: 'button', disabled: bloque, onclick: suivant },
           occupe ? h('span', { class: 'ob-spin' }) : null, h('span', { text: libelle() }), occupe ? null : trait(15, s('path', { d: 'M9 5l7 7-7 7' }))));
     }

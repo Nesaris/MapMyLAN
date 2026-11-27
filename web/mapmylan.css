@@ -1051,7 +1051,6 @@ table.boites td{padding:12px 16px;font-size:13px}
 textarea.ob-field{resize:vertical;font-size:11.5px;line-height:1.5}
 .ob-hint{color:var(--faint);font-size:11.5px;margin-top:6px;line-height:1.5}
 .ob-row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.ob-row3{display:grid;grid-template-columns:1fr 110px;gap:12px}
 .ob-liste{list-style:none;margin:20px 0 0;padding:0;display:grid;gap:11px}
 .ob-liste li{display:flex;gap:11px;align-items:flex-start;color:var(--ink-soft);font-size:13.5px;line-height:1.5}
 .ob-liste .c{width:18px;height:18px;border-radius:6px;background:var(--wash);color:var(--accent);
@@ -1119,7 +1118,7 @@ textarea.ob-field{resize:vertical;font-size:11.5px;line-height:1.5}
   .ob-body{padding:0 18px 4px}
   .ob-foot{padding:14px 18px 16px;gap:10px}
   .ob-step h1{font-size:22px}
-  .ob-row2,.ob-row3{grid-template-columns:1fr}
+  .ob-row2{grid-template-columns:1fr}
   .ob-next{padding:10px 16px;font-size:13px}
   .ob-next svg{display:none}
   .ob-passer{order:3;width:100%;text-align:left}
@@ -1135,6 +1134,43 @@ textarea.ob-field{resize:vertical;font-size:11.5px;line-height:1.5}
 .ob-empreinte{margin-top:16px;padding:12px 14px;border-radius:10px;background:var(--well)}
 .ob-empreinte code{display:block;font-family:var(--mono);font-size:12px;color:var(--ink);overflow-wrap:anywhere}
 .ob-overlay svg{display:block;flex:none}
+.ob-opt .grow{flex:1;min-width:0}
+.ob-plus{margin-top:18px}
+.ob-plus>summary{cursor:pointer;color:var(--muted);font-size:13px}
+.ob-plus[open]>summary{margin-bottom:4px}
+.ob-opt>svg{align-self:center;color:var(--muted)}
+
+/* Givre (socle/web/givre.js) : les deux mains derrière la vitre, comme la porte. */
+:root .ob-overlay.givre{--paper:#fbfdff;--surface:rgba(255,255,255,.5);--ink:#16263a;--ink-soft:#24364b;--muted:#5d7186;--faint:#7f93a6;--accent:#24aad6;
+  --hair:rgba(120,165,200,.32);--hair-soft:rgba(130,175,210,.22);--well:rgba(255,255,255,.58);--wash:rgba(36,170,214,.1);
+  background:#fbfdff;align-items:flex-start;padding:var(--givre-haut,20vh) 16px 0;font-family:"Inter Tight",var(--sans);font-size:14px}
+:root .ob-overlay.givre.nuit{--paper:#0c1420;--surface:rgba(18,32,48,.5);--ink:#e3eef7;--ink-soft:#c9dae8;--muted:#93a9bc;--faint:#7890a5;--accent:#4cc6ec;
+  --hair:rgba(140,190,225,.22);--hair-soft:rgba(140,190,225,.14);--well:rgba(10,22,36,.55);--wash:rgba(76,198,236,.12);background:#0c1420}
+.ob-overlay.givre .ob-halos{display:none}
+.ob-overlay.givre .givre-fond,.ob-overlay.givre .givre-mains{position:fixed;inset:0;width:100%;height:100%;display:block;z-index:0}
+.ob-overlay.givre .givre-fond{pointer-events:none}
+.ob-overlay.givre .givre-mains{touch-action:none;cursor:crosshair}
+.ob-overlay.givre .givre-eclat{position:fixed;z-index:0;width:220px;height:220px;margin:-110px 0 0 -110px;border-radius:50%;pointer-events:none;opacity:0;transform:scale(.2);
+  background:radial-gradient(closest-side,rgba(255,255,255,1),rgba(140,220,245,.75) 28%,rgba(36,170,214,.18) 60%,transparent)}
+.ob-overlay.givre .givre-eclat.go{animation:givre-eclat 1.6s cubic-bezier(.2,.7,.2,1) forwards}
+:root .ob-overlay.givre .ob-wiz{max-width:560px;margin:0 auto;border-radius:26px;isolation:isolate;overflow:hidden;max-height:calc(100dvh - var(--givre-haut,20vh) - 24px);
+  background:linear-gradient(160deg,rgba(255,255,255,.56),rgba(232,244,252,.28) 55%,rgba(246,250,255,.44));
+  -webkit-backdrop-filter:blur(12px) saturate(1.4);backdrop-filter:blur(12px) saturate(1.4);border:1px solid rgba(255,255,255,.9);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,1),0 0 0 1px rgba(130,175,210,.16),0 34px 70px -28px rgba(30,80,130,.34),0 10px 24px -12px rgba(30,80,130,.18);
+  transition:opacity .7s ease,transform .7s cubic-bezier(.2,.8,.2,1),filter .7s ease}
+:root .ob-overlay.givre.nuit .ob-wiz{background:linear-gradient(160deg,rgba(30,52,74,.55),rgba(14,28,44,.35) 55%,rgba(24,42,62,.5));border-color:rgba(160,205,235,.22);
+  box-shadow:inset 0 1px 0 rgba(200,230,250,.18),0 34px 70px -28px rgba(0,0,0,.6)}
+.ob-overlay.givre .ob-brand .g{background:none;color:var(--ink);box-shadow:none;width:22px;height:22px}
+.ob-overlay.givre .ob-brand b{font-size:14px}
+.ob-overlay.givre .ob-step h1{font-size:25px;letter-spacing:-.02em}
+.ob-overlay.givre .ob-lbl{text-transform:none;letter-spacing:0;font-size:13px;font-weight:500;color:var(--ink)}
+:root .ob-overlay.givre .ob-field{border-radius:13px;min-height:44px;font-family:inherit}
+.ob-overlay.givre .ob-field:focus{box-shadow:0 0 0 4px color-mix(in srgb,var(--accent) 16%,transparent)}
+.ob-overlay.givre .ob-opt,.ob-overlay.givre .ob-basc,.ob-overlay.givre .ob-note,.ob-overlay.givre .ob-empreinte{border-radius:13px}
+.ob-overlay.givre .ob-next{border-radius:13px;background:linear-gradient(180deg,#22364d,#14223a);color:#fff;box-shadow:0 10px 22px -10px rgba(20,40,70,.55)}
+.ob-overlay.givre.nuit .ob-next{background:linear-gradient(180deg,#eaf3fa,#cddfed);color:#0c1420}
+:root .ob-overlay.givre.fin .ob-wiz{opacity:0;transform:translateY(-10px) scale(.98);filter:blur(8px)}
+@media (max-width:560px){:root .ob-overlay.givre{padding-left:12px;padding-right:12px}}
 
 /* Largeurs. La coque suit l'écran (soma.css) ; le contenu suit la zone de
    travail, par requêtes de conteneur : ce qui ne tient plus se replie ou se
